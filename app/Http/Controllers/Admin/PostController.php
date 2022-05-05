@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Category;
+
 use App\Http\Controllers\Controller;
 
 use App\Post;
@@ -32,8 +34,13 @@ class PostController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {
-        return view('admin.posts.create');
+    {   
+        //recuperare tutte le categorie dal database per inserirle nella select
+            //passare alla vista
+            //ciclare con vista
+        $categories = Category::all();
+
+        return view('admin.posts.create', compact('categories'));
     }
 
     /**
@@ -48,14 +55,15 @@ class PostController extends Controller
         $request->validate([
             'title'=>'required|string|max:150',
             'content'=>'required|string',
-            'published_at'=>'nullable|before_or_equal:today'
+            'published_at'=>'nullable|before_or_equal:today',
+            'category_id'=>'nullable|exists:categories,id',
         ]);
 
         $data = $request->all();
 
         $slug = Post::getUniqueSlug($data['title']);
 
-        dd($slug);
+        // dd($slug);
 
         $post = new Post();
         $post->fill( $data ); 
