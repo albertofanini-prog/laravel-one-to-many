@@ -23,7 +23,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::orderBy('created_at','desc')->limit(20)->get();
+        $posts = Post::with('category')->orderBy('created_at','desc')->limit(20)->get();
 
         return view('admin.posts.index', compact('posts'));
     }
@@ -95,7 +95,9 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        return view('admin.posts.edit', compact('post'));
+        $categories = Category::all();
+
+        return view('admin.posts.edit', compact('post', 'categories'));
     }
 
     /**
@@ -111,7 +113,8 @@ class PostController extends Controller
         $request->validate([
             'title'=>'required|string|max:150',
             'content'=>'required|string',
-            'published_at'=>'nullable|before_or_equal:today'
+            'published_at'=>'nullable|before_or_equal:today',
+            'category_id'=>'nullable|exists:categories,id',
         ]);
         //Prendere id dati
         $data = $request->all();
@@ -121,10 +124,9 @@ class PostController extends Controller
             $post = new Post();
             //nuovo slug
             $slug = Post::getUniqueSlug($data['title']);
-
+            $data['slug'] = $slug;
         }
 
-        $data['slug'] = $slug;
 
         //Aggiornare i dati
         $post->update($data);

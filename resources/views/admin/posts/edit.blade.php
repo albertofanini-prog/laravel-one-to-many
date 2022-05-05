@@ -7,10 +7,10 @@
                 <h1>Modifica post: {{$post->title}}</h1>
             </div>
             <div class="col-2">
-                <form action="{{ route('admin.posts.destroy', $post)}}" method="POST">
+                <form id="delete-form" action="{{ route('admin.posts.destroy', $post)}}" method="POST">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger">
+                    <button for="delete-form" type="submit" class="btn btn-danger">
                         Elimina
                     </button>
                 </form>
@@ -18,8 +18,8 @@
         </div>
     </div>
 
-    <div class="container">a
-        <form action="{{ route('admin.posts.update', $post) }}" method="POST">
+    <div class="container">
+        <form id="edit" action="{{ route('admin.posts.update', $post) }}" method="POST">
             @csrf
             @method('PUT')
   
@@ -44,6 +44,21 @@
             </div>
 
             <div class="form-group">
+                <label for="category_id">Categoria</label>
+                <select class="form-control @error('category_id') is-invalid @enderror" id="category_id" name="category_id">
+                  <option value=""></option>
+                  @foreach ($categories as $category)
+                      <option {{old('category_id') && old('category_id', optional($post)->category->id) == $category->id ? 'selected' : ''}} value="{{$category->id}}">{{$category->name}}</option>
+                  @endforeach
+                </select>
+                @error('category_id')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
+
+            <div class="form-group">
                 <label for="title">Data di pubblicazione</label>
                 <input type="date" class="form-control @error('published_at') is-invalid @enderror" id="published_at" name="published_at" value="{{ old('published_at') ?: Str::substr($post->published_at,  0, 10) }}" aria-describedby="emailHelp">
                 @error('published_at')
@@ -52,7 +67,7 @@
                     </div>
                 @enderror
             </div>
-            <button type="submit" class="btn btn-primary">Salva</button>
+            <button type="submit" for="edit" class="btn btn-primary">Salva</button>
     
         </form>
     </div>
